@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,8 +16,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('dashboard');
+})->middleware('auth');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -29,3 +30,20 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+
+
+Route::middleware('auth')->group( function(){
+    Route::get('/deposit',[TransactionController::class,'createDeposit'])->name('create.deposit');
+    Route::post('/deposit',[TransactionController::class,'deposit'])->name('store.deposit');
+
+    Route::get('/withdraw',[TransactionController::class,'createWithdraw'])->name('create.withdraw');
+    Route::post('/withdraw',[TransactionController::class,'withdraw'])->name('withdraw');
+
+    Route::get('/all-transactions',[TransactionController::class,'allTransactions'])->name('allTransactions');
+    Route::get('/current-balance',[TransactionController::class,'currentBalance'])->name('currentBalance');
+
+    Route::get('/deposited-transactions',[TransactionController::class,'depositedTransaction'])->name('depositedTransaction');
+    Route::get('/withdrawal-transactions',[TransactionController::class,'withdrawalTransaction'])->name('withdrawalTransaction');
+
+});
