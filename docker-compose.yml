@@ -4,6 +4,7 @@ services:
 
   app:
     build: .
+    image: riyadrb/laravel-banking
     volumes:
       - ./:/var/www/html
     depends_on:
