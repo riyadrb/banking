@@ -9,25 +9,52 @@ RUN apt update && apt install -y \
     libpng-dev \
     libfreetype6-dev \
     libonig-dev \
-    grep
+    grep \
+    curl \
+    gnupg2
 
-RUN rm -rf /var/lib/apt/lists/*
+# RUN rm -rf /var/lib/apt/lists/*
+
+
+RUN apt-get update && apt-get install -y nodejs npm
+
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+
 RUN docker-php-ext-install pdo pdo_mysql mbstring gd
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY composer.json ./
-COPY . ./
+
+COPY composer.json .
+
+COPY . .
+
 RUN composer install
 
 RUN php artisan key:generate
+
 RUN php artisan storage:link
 
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN npm install
+
+ARG USER=root
+
+RUN chown -R $USER:www-data storage
+RUN chown -R $USER:www-data bootstrap/cache
+
+RUN chmod -R 775 storage
+RUN chmod -R 775 bootstrap/cache
+
+RUN php artisan route:clear
+RUN php artisan config:clear
+RUN php artisan cache:clear
+RUN php artisan optimize
+
+
 
 # CMD php artisan serve --host=0.0.0.0 --port=8000
 
-# EXPOSE 9000
-# CMD [ "php-fpm" ]
+EXPOSE 8000
+
+CMD [ "php-fpm" ]
+
