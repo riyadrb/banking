@@ -16,7 +16,7 @@ RUN apt update && apt install -y \
 # RUN rm -rf /var/lib/apt/lists/*
 
 
-RUN apt-get update && apt-get install -y nodejs npm
+RUN apt install -y nodejs npm
 
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
@@ -25,11 +25,11 @@ RUN docker-php-ext-install pdo pdo_mysql mbstring gd
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-COPY composer.json .
 
-COPY . .
+COPY .  /var/www/html/
 
 RUN composer install
+
 
 RUN php artisan key:generate
 
